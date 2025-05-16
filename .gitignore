@@ -5,6 +5,8 @@
 .Ruserdata/
 .Renviron
 .Rprofile
+.github/
+.vscode/
 
 /app/www/
 /app/data/
