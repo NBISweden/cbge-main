@@ -12,6 +12,8 @@ crispr_analysis_server <- function(id) {
     qc_html_files <- reactiveVal(NULL)
     design_data <- reactiveVal(NULL)
     filtered_data <- reactiveVal(NULL)  # New reactive value for filtered data
+    current_dir <- reactiveVal("/project-vol")
+    config_current_dir <- reactiveVal("/project-vol")
     
     # Function to read CSV with proper separator
     read_crispr_data <- function(file) {
@@ -1551,28 +1553,20 @@ crispr_analysis_server <- function(id) {
 
     # Load project button handler
     observeEvent(input$load_project, {
-      req(project_data(), config_data())
-      show_trees(TRUE)
-      # Find the FastQC directory anywhere under project_data()
-      fastqc_dirs <- list.dirs(project_data(), recursive = TRUE, full.names = TRUE)
-      fastqc_dir <- fastqc_dirs[grepl("results[/\\\\]FastQC$", fastqc_dirs)]
-      cat('Project data path:', project_data(), '\n')
-      cat('Detected FastQC directories:', fastqc_dir, '\n')
-      if (length(fastqc_dir) > 0 && dir.exists(fastqc_dir[1])) {
-        htmls <- list.files(fastqc_dir[1], pattern = "(?i)\\.html$", recursive = TRUE, full.names = TRUE)
-        rel_htmls <- list.files(fastqc_dir[1], pattern = "(?i)\\.html$", recursive = TRUE, full.names = FALSE)
-        cat('Found HTML files (full):', htmls, '\n')
-        cat('Found HTML files (relative):', rel_htmls, '\n')
-        qc_html_files(setNames(htmls, rel_htmls))
-        updateSelectInput(session, "qc_sample",
-          choices = rel_htmls,
-          selected = if (length(rel_htmls) > 0) rel_htmls[1] else NULL
-        )
-      } else {
-        cat('FastQC directory does not exist!\n')
-        qc_html_files(NULL)
-        updateSelectInput(session, "qc_sample", choices = NULL)
+      req(input$project_path, input$config_path)
+      
+      project_path <- input$project_path
+      config_path <- input$config_path
+      
+      if (!file.exists(project_path) || !file.exists(config_path)) {
+        showNotification("Selected paths do not exist", type = "error")
+        return()
       }
+      
+      project_data(project_path)
+      config_data(config_path)
+      
+      showNotification("Project loaded successfully!", type = "message")
     })
     
     # Project structure display
@@ -1947,6 +1941,103 @@ crispr_analysis_server <- function(id) {
             do.call(tagList, imgs)
           })
         })
+      }
+    })
+
+    # Function to list files and directories
+    list_files <- function(path) {
+      if (!dir.exists(path)) return(NULL)
+      files <- list.files(path, full.names = TRUE)
+      file_info <- data.frame(
+        name = basename(files),
+        is_dir = dir.exists(files),
+        path = files,
+        stringsAsFactors = FALSE
+      )
+      return(file_info)
+    }
+
+    # Function to create file browser UI
+    create_file_browser <- function(files, current_path, ns_prefix) {
+      if (is.null(files)) return(NULL)
+      
+      # Sort: directories first, then files
+      files <- files[order(!files$is_dir, files$name), ]
+      
+      # Create clickable items
+      items <- lapply(seq_len(nrow(files)), function(i) {
+        file <- files[i, ]
+        icon <- if (file$is_dir) "📁" else "📄"
+        div(
+          class = "file-item",
+          style = "cursor: pointer; padding: 5px;",
+          onclick = sprintf(
+            "Shiny.setInputValue('%s', '%s')",
+            paste0(ns_prefix, "_file_click"),
+            file$path
+          ),
+          paste(icon, file$name)
+        )
+      })
+      
+      # Add parent directory link if not in root
+      if (current_path != "/project-vol") {
+        parent_dir <- dirname(current_path)
+        items <- c(
+          div(
+            class = "file-item",
+            style = "cursor: pointer; padding: 5px;",
+            onclick = sprintf(
+              "Shiny.setInputValue('%s', '%s')",
+              paste0(ns_prefix, "_file_click"),
+              parent_dir
+            ),
+            "📁 .."
+          ),
+          items
+        )
+      }
+      
+      return(div(items))
+    }
+    
+    # Project file browser
+    observeEvent(input$browse_project, {
+      current_dir("/project-vol")
+      files <- list_files(current_dir())
+      output$current_path <- renderText(current_dir())
+      output$file_list <- renderUI(create_file_browser(files, current_dir(), "project"))
+    })
+    
+    observeEvent(input$project_file_click, {
+      path <- input$project_file_click
+      if (dir.exists(path)) {
+        current_dir(path)
+        files <- list_files(path)
+        output$current_path <- renderText(path)
+        output$file_list <- renderUI(create_file_browser(files, path, "project"))
+      } else {
+        updateTextInput(session, "project_path", value = path)
+      }
+    })
+    
+    # Config file browser
+    observeEvent(input$browse_config, {
+      config_current_dir("/project-vol")
+      files <- list_files(config_current_dir())
+      output$config_current_path <- renderText(config_current_dir())
+      output$config_file_list <- renderUI(create_file_browser(files, config_current_dir(), "config"))
+    })
+    
+    observeEvent(input$config_file_click, {
+      path <- input$config_file_click
+      if (dir.exists(path)) {
+        config_current_dir(path)
+        files <- list_files(path)
+        output$config_current_path <- renderText(path)
+        output$config_file_list <- renderUI(create_file_browser(files, path, "config"))
+      } else {
+        updateTextInput(session, "config_path", value = path)
       }
     })
   })
