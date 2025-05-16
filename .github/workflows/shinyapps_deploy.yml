@@ -1,29 +1,41 @@
-name: shinyapps-deployment
+name: docker-image
+
 on:
-    push:
-        branches:
-            - main
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'Dockerfile'
+      - '.github/workflows/docker-build.yml'
+
 jobs:
-  test:
-      name: shinyio deployment
-      runs-on: ubuntu-latest
-      steps:
-      - uses: r-lib/actions/setup-r@v2-branch
-      - name: Install rsconnect
-        run: |
-          sudo apt-get install -y libcurl4-openssl-dev
-          R -e 'install.packages("curl")' 
-          R -e 'install.packages("rsconnect")'
-          R -e 'install.packages("shiny")'  
-          R -e 'install.packages("httpuv")'
-          R -e 'install.packages("rmarkdown")'
-          R -e 'install.packages("knitr")'
-          R -e 'install.packages("jsonlite")'
-          R -e 'install.packages("googlesheets4")'
-          R -e 'install.packages("shinyvalidate")'
-          R -e 'install.packages("shinyjs")'
-      - uses: actions/checkout@v4
-      - name: Connect shiny server
-        run: Rscript -e "rsconnect::setAccountInfo(name=${{ secrets.SHINYIO_NAME }}, token=${{ secrets.SHINYIO_TOKEN }}, secret=${{ secrets.SHINYIO_SECRET }})"
-      - name: deploy app 
-        run: Rscript -e "rsconnect::deployApp(appName = 'ShinyOlink')" 
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: jd21/shinyolink
+          tags: |
+            type=raw,value={{date 'YYYYMMDD'}}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            jd21/shinyolink:latest

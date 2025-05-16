@@ -2,6 +2,12 @@ name: docker-image
 
 on:
   push:
+    branches:
+      - main
+    paths:
+      - 'app/**'
+      - 'Dockerfile'
+      - '.github/workflows/docker-build.yml'
 
 jobs:
   docker:
