@@ -1,0 +1,107 @@
+---
+title: "`r params$content$title`"
+author: "`r params$content$author`"
+date: "`r params$content$date`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: united
+    self_contained: true
+params:
+  content: NULL
+  interactive: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(DT)
+```
+
+# Analysis Summary
+
+## Data Overview
+```{r data-summary}
+if (!is.null(params$content$data_summary)) {
+  ds <- params$content$data_summary
+  cat("**Knockout Data:**\n\n")
+  cat(sprintf("- Number of genes: %.0f\n", ds$ko_genes))
+  cat(sprintf("- Number of guides: %.0f\n", ds$ko_guides))
+  cat(sprintf("- Total read count: %.0f\n\n", ds$ko_reads))
+  
+  cat("**Wildtype Data:**\n\n")
+  cat(sprintf("- Number of genes: %.0f\n", ds$wt_genes))
+  cat(sprintf("- Number of guides: %.0f\n", ds$wt_guides))
+  cat(sprintf("- Total read count: %.0f\n", ds$wt_reads))
+}
+```
+
+## Differential Analysis Results
+```{r diff-analysis}
+if (!is.null(params$content$diff_analysis)) {
+  da <- params$content$diff_analysis
+  cat("**Summary Statistics:**\n\n")
+  cat(sprintf("- Total genes analyzed: %.0f\n", da$total_genes))
+  cat(sprintf("- Significant genes: %.0f\n", da$significant_genes))
+  cat(sprintf("- Up-regulated genes: %.0f\n", da$up_regulated))
+  cat(sprintf("- Down-regulated genes: %.0f\n\n", da$down_regulated))
+  
+  if (params$interactive) {
+    cat("### Volcano Plot\n")
+    if (!is.null(da$volcano_plot_file) && file.exists(da$volcano_plot_file)) {
+      htmltools::includeHTML(da$volcano_plot_file)
+    }
+    
+    cat("\n### MA Plot\n")
+    if (!is.null(da$ma_plot_file) && file.exists(da$ma_plot_file)) {
+      htmltools::includeHTML(da$ma_plot_file)
+    }
+  }
+  
+  cat("\n### Top Differentially Expressed Genes\n")
+  DT::datatable(da$results_table, 
+                options = list(pageLength = 10, scrollX = TRUE),
+                rownames = FALSE)
+}
+```
+
+## Gene Set Enrichment Analysis
+```{r gsea}
+if (!is.null(params$content$gsea)) {
+  gs <- params$content$gsea
+  cat("**Analysis Details:**\n\n")
+  cat(sprintf("- Method: %s\n", gs$method))
+  cat(sprintf("- Gene Set Collection: %s\n", gs$collection))
+  cat(sprintf("- Significant Terms: %.0f\n\n", gs$significant_terms))
+  
+  if (params$interactive) {
+    cat("### Enrichment Plot\n")
+    if (!is.null(gs$enrichment_plot_file) && file.exists(gs$enrichment_plot_file)) {
+      htmltools::includeHTML(gs$enrichment_plot_file)
+    }
+  }
+  
+  cat("\n### Top Enriched Terms\n")
+  DT::datatable(gs$results_table,
+                options = list(pageLength = 10, scrollX = TRUE),
+                rownames = FALSE)
+}
+```
+
+# Methods
+```{r methods}
+if (!is.null(params$content$methods)) {
+  cat("## Differential Analysis\n")
+  cat(params$content$methods$differential_analysis)
+  
+  cat("\n\n## Enrichment Analysis\n")
+  cat(params$content$methods$enrichment_analysis)
+}
+```
+
+# Session Information
+```{r session-info}
+if (!is.null(params$content$session_info)) {
+  print(params$content$session_info)
+}
+``` 

@@ -1,0 +1,9 @@
+.DS_Store
+/app/www/
+/app/data/
+/app/extras/*
+/app/rsconnect/
+/app/rsconnect/
+renv/
+/script/*.R
+/old_scripts/
