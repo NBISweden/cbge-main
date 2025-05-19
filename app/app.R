@@ -169,7 +169,8 @@ ui <- fluidPage(
         omics_integration_ui("omics")
       )
     )
-  )
+  ),
+  verbatimTextOutput("project_vol_contents")
 )
 
 # Define the main server
@@ -495,6 +496,10 @@ server <- function(input, output, session) {
   # Omics Integration logic placeholder
   observeEvent(input$integrate, {
     # Placeholder for integrating CRISPR and PISA data
+  })
+  
+  output$project_vol_contents <- renderPrint({
+    list.files("/project-vol", recursive = TRUE)
   })
 }
 
