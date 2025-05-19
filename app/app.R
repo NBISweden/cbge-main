@@ -170,7 +170,7 @@ ui <- fluidPage(
       )
     )
   ),
-  verbatimTextOutput("project_vol_contents")
+  verbatimTextOutput("project_vol_files")
 )
 
 # Define the main server
@@ -498,7 +498,7 @@ server <- function(input, output, session) {
     # Placeholder for integrating CRISPR and PISA data
   })
   
-  output$project_vol_contents <- renderPrint({
+  output$project_vol_files <- renderPrint({
     list.files("/project-vol", recursive = TRUE)
   })
 }
