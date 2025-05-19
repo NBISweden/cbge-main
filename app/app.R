@@ -7,6 +7,7 @@ library(viridis)
 library(writexl)
 library(shinyjs)
 library(DT)
+library(shinyFiles)
 
 options(shiny.maxRequestSize=500*1024^2)
 
@@ -500,6 +501,12 @@ server <- function(input, output, session) {
   
   output$project_vol_files <- renderPrint({
     list.files("/project-vol", recursive = TRUE)
+  })
+
+  shinyFileChoose(input, "file_browse", roots = c(ProjectVol = "/project-vol"), session = session)
+
+  output$selected_file <- renderPrint({
+    parseFilePaths(roots = c(ProjectVol = "/project-vol"), input$file_browse)
   })
 }
 
