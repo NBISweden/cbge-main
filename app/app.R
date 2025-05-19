@@ -7,7 +7,6 @@ library(viridis)
 library(writexl)
 library(shinyjs)
 library(DT)
-library(shinyFiles)
 
 options(shiny.maxRequestSize=500*1024^2)
 
@@ -170,8 +169,7 @@ ui <- fluidPage(
         omics_integration_ui("omics")
       )
     )
-  ),
-  verbatimTextOutput("project_vol_files")
+  )
 )
 
 # Define the main server
@@ -497,16 +495,6 @@ server <- function(input, output, session) {
   # Omics Integration logic placeholder
   observeEvent(input$integrate, {
     # Placeholder for integrating CRISPR and PISA data
-  })
-  
-  output$project_vol_files <- renderPrint({
-    list.files("/project-vol", recursive = TRUE)
-  })
-
-  shinyFileChoose(input, "file_browse", roots = c(ProjectVol = "/project-vol"), session = session)
-
-  output$selected_file <- renderPrint({
-    parseFilePaths(roots = c(ProjectVol = "/project-vol"), input$file_browse)
   })
 }
 

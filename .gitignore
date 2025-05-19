@@ -5,6 +5,7 @@
 .Ruserdata/
 .Renviron
 .Rprofile
+.github/
 .vscode/
 *.Rproj
 
