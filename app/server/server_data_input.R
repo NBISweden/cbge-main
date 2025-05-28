@@ -19,6 +19,14 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
     file.path(project_vol_path, file_name)
   }
 
+  observe({
+    data_dir <- getProjectVolPath()
+    crispr_files <- list.files(data_dir, pattern = "\\.csv$", full.names = TRUE)
+    updateSelectInput(session, "crispr_server_file", choices = crispr_files)
+    updateSelectInput(session, "pisa_server_file", choices = crispr_files)
+    updateSelectInput(session, "meta_server_file", choices = crispr_files)
+  })
+
   observeEvent(input$merge_data, {
     withProgress(message = 'Merging data...', value = 0, {
       req(input$crispr_file, input$meta_file)
