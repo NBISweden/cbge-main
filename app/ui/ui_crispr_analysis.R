@@ -11,37 +11,45 @@ crispr_analysis_ui <- function(id) {
               h4("Project Upload", class = "mb-4"),
               div(class = "mb-4",
                 h5("Main Data Folder"),
+                fileInput(ns("project_folder"), "Upload Main Data Folder",
+                       accept = c(".zip", ".tar", ".tar.gz"),
+                       width = "100%"),
                 div(class = "alert alert-info",
                   tags$b("Note:"),
-                  "Files should be in the project-vol folder:",
+                  "Upload a zipped/tarred project folder containing:",
                   tags$ul(
                     tags$li("report.reads"),
                     tags$li("results/FastQC/samples")
                   )
                 ),
-                textInput(ns("project_path"), "Project Path", 
-                         value = "/project-vol",
-                         placeholder = "Enter path in project-vol folder"),
-                actionButton(ns("browse_project"), "Browse Files", 
-                           class = "btn-secondary"),
-                div(id = ns("file_browser"),
-                    style = "margin-top: 10px;",
-                    verbatimTextOutput(ns("current_path")),
-                    uiOutput(ns("file_list"))
+                div(id = ns("upload_progress"),
+                    style = "display: none;",
+                    div(class = "progress",
+                        div(class = "progress-bar progress-bar-striped progress-bar-animated",
+                            role = "progressbar",
+                            style = "width: 0%",
+                            "0%")
+                    )
+                ),
+                div(id = ns("upload_error"),
+                    class = "alert alert-danger",
+                    style = "display: none;",
+                    "Error uploading file. Please try again or contact support if the problem persists."
                 )
               ),
               div(class = "mb-4",
                 h5("Configuration Folder"),
-                textInput(ns("config_path"), "Config Path", 
-                         value = "/project-vol",
-                         placeholder = "Enter path in project-vol folder"),
-                actionButton(ns("browse_config"), "Browse Files", 
-                           class = "btn-secondary"),
-                div(id = ns("config_browser"),
-                    style = "margin-top: 10px;",
-                    verbatimTextOutput(ns("config_current_path")),
-                    uiOutput(ns("config_file_list"))
-                )
+                fileInput(ns("config_folder"), "Upload Config Folder",
+                       accept = c(".zip", ".tar", ".tar.gz"),
+                       width = "100%"),
+                div(class = "alert alert-info",
+                  tags$b("Note:"),
+                  "Upload a zipped/tarred folder containing:",
+                  tags$ul(
+                    tags$li("*_config_files/ - Configuration files")
+                  )
+                ),
+                verbatimTextOutput(ns("config_path"))
               ),
               div(class = "mt-3",
                 actionButton(ns("load_project"), "Load Project",

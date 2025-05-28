@@ -5,9 +5,6 @@
 .Ruserdata/
 .Renviron
 .Rprofile
-.github/
-.vscode/
-*.Rproj
 
 /app/www/
 /app/data/
@@ -17,3 +14,7 @@
 renv/
 /script/*.R
 /old_scripts/
+
+setup_environment.R
+cbge-main.Rproj
+.vscode/
