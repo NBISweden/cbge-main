@@ -20,7 +20,7 @@ crispr_analysis_ui <- function(id) {
                   )
                 ),
                 textInput(ns("project_path"), "Project Path", 
-                         value = "/project-vol",
+                         value = "/srv/shiny-server/data",
                          placeholder = "Enter path in project-vol folder"),
                 actionButton(ns("browse_project"), "Browse Files", 
                            class = "btn-secondary"),
@@ -33,7 +33,7 @@ crispr_analysis_ui <- function(id) {
               div(class = "mb-4",
                 h5("Configuration Folder"),
                 textInput(ns("config_path"), "Config Path", 
-                         value = "/project-vol",
+                         value = "/srv/shiny-server/data",
                          placeholder = "Enter path in project-vol folder"),
                 actionButton(ns("browse_config"), "Browse Files", 
                            class = "btn-secondary"),

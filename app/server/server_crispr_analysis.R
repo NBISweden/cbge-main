@@ -12,8 +12,8 @@ crispr_analysis_server <- function(id) {
     qc_html_files <- reactiveVal(NULL)
     design_data <- reactiveVal(NULL)
     filtered_data <- reactiveVal(NULL)  # New reactive value for filtered data
-    current_dir <- reactiveVal("/project-vol")
-    config_current_dir <- reactiveVal("/project-vol")
+    current_dir <- reactiveVal("/srv/shiny-server/data")
+    config_current_dir <- reactiveVal("/srv/shiny-server/data")
     
     # Function to read CSV with proper separator
     read_crispr_data <- function(file) {
@@ -1981,7 +1981,7 @@ crispr_analysis_server <- function(id) {
       })
       
       # Add parent directory link if not in root
-      if (current_path != "/project-vol") {
+      if (current_path != "/srv/shiny-server/data") {
         parent_dir <- dirname(current_path)
         items <- c(
           div(
@@ -2003,7 +2003,7 @@ crispr_analysis_server <- function(id) {
     
     # Project file browser
     observeEvent(input$browse_project, {
-      current_dir("/project-vol")
+      current_dir("/srv/shiny-server/data")
       files <- list_files(current_dir())
       output$current_path <- renderText(current_dir())
       output$file_list <- renderUI(create_file_browser(files, current_dir(), "project"))
@@ -2023,7 +2023,7 @@ crispr_analysis_server <- function(id) {
     
     # Config file browser
     observeEvent(input$browse_config, {
-      config_current_dir("/project-vol")
+      config_current_dir("/srv/shiny-server/data")
       files <- list_files(config_current_dir())
       output$config_current_path <- renderText(config_current_dir())
       output$config_file_list <- renderUI(create_file_browser(files, config_current_dir(), "config"))

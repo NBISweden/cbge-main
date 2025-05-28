@@ -99,9 +99,9 @@ customFileInput <- function(inputId, label, accept = NULL, multiple = FALSE) {
 
 # Function to get the project-vol directory path
 getProjectVolPath <- function() {
-  if (dir.exists("/project-vol")) {
-    return("/project-vol")
+  if (dir.exists("/srv/shiny-server/data")) {
+    return("/srv/shiny-server/data")
   } else {
     return(getwd())
   }
-} 
+}
