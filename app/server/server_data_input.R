@@ -13,14 +13,20 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
     })
   }
 
+  # Helper function to get full file path
+  get_full_path <- function(file_name) {
+    project_vol_path <- getProjectVolPath()
+    file.path(project_vol_path, file_name)
+  }
+
   observeEvent(input$merge_data, {
     withProgress(message = 'Merging data...', value = 0, {
       req(input$crispr_file, input$meta_file)
       
       tryCatch({
         # Read files using the helper function
-        crispr_data <- read_file_with_delimiters(input$crispr_file$datapath)
-        pisa_data <- read_file_with_delimiters(input$meta_file$datapath) %>%
+        crispr_data <- read_file_with_delimiters(get_full_path(input$crispr_file$name))
+        pisa_data <- read_file_with_delimiters(get_full_path(input$meta_file$name)) %>%
         distinct(SUBJID, .keep_all = TRUE)
       
       if("SUBJID" %in% colnames(pisa_data)) {
@@ -28,7 +34,7 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
       }
       
       if (!is.null(input$pisa_file)) {
-          key_data <- read_file_with_delimiters(input$pisa_file$datapath) %>%
+          key_data <- read_file_with_delimiters(get_full_path(input$pisa_file$name)) %>%
           distinct(SampleID, .keep_all = TRUE)
         key_data$SampleID <- as.character(key_data$SampleID)
         
@@ -65,7 +71,7 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
       req(input$meta_file)
       
       tryCatch({
-        pisa_data <- read_file_with_delimiters(input$meta_file$datapath) %>%
+        pisa_data <- read_file_with_delimiters(get_full_path(input$meta_file$name)) %>%
         distinct(SUBJID, .keep_all = TRUE)
       
       if("SUBJID" %in% colnames(pisa_data)) {
@@ -73,7 +79,7 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
       }
       
       if (!is.null(input$pisa_file)) {
-          key_data <- read_file_with_delimiters(input$pisa_file$datapath) %>%
+          key_data <- read_file_with_delimiters(get_full_path(input$pisa_file$name)) %>%
           distinct(SampleID, .keep_all = TRUE)
         key_data$SampleID <- as.character(key_data$SampleID)
         
@@ -94,7 +100,7 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
   observeEvent(input$crispr_file, {
     req(input$crispr_file)
     tryCatch({
-      crispr_data <- read_file_with_delimiters(input$crispr_file$datapath)
+      crispr_data <- read_file_with_delimiters(get_full_path(input$crispr_file$name))
     output$crispr_head <- renderDT({
       datatable(head(crispr_data), options = list(scrollX = TRUE))
       })
@@ -106,7 +112,7 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
   observeEvent(input$pisa_file, {
     req(input$pisa_file)
     tryCatch({
-      pisa_data <- read_file_with_delimiters(input$pisa_file$datapath)
+      pisa_data <- read_file_with_delimiters(get_full_path(input$pisa_file$name))
     output$pisa_head <- renderDT({
       datatable(head(pisa_data), options = list(scrollX = TRUE))
       })
@@ -118,7 +124,7 @@ data_input_server <- function(input, output, session, merged_data, var_key_merge
   observeEvent(input$meta_file, {
     req(input$meta_file)
     tryCatch({
-      meta_data <- read_file_with_delimiters(input$meta_file$datapath)
+      meta_data <- read_file_with_delimiters(get_full_path(input$meta_file$name))
     output$meta_head <- renderDT({
       datatable(head(meta_data), options = list(scrollX = TRUE))
       })

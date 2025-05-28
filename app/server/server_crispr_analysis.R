@@ -2005,16 +2005,8 @@ crispr_analysis_server <- function(id) {
     observeEvent(input$browse_project, {
       current_dir("/project-vol")
       files <- list_files(current_dir())
-      print("[DEBUG] Files in /project-vol:")
-      print(files)
       output$current_path <- renderText(current_dir())
-      output$file_list <- renderUI({
-        if (is.null(files) || nrow(files) == 0) {
-          div("No files found or folder not accessible.")
-        } else {
-          create_file_browser(files, current_dir(), "project")
-        }
-      })
+      output$file_list <- renderUI(create_file_browser(files, current_dir(), "project"))
     })
     
     observeEvent(input$project_file_click, {
@@ -2022,16 +2014,8 @@ crispr_analysis_server <- function(id) {
       if (dir.exists(path)) {
         current_dir(path)
         files <- list_files(path)
-        print(paste0("[DEBUG] Files in ", path, ":"))
-        print(files)
         output$current_path <- renderText(path)
-        output$file_list <- renderUI({
-          if (is.null(files) || nrow(files) == 0) {
-            div("No files found or folder not accessible.")
-          } else {
-            create_file_browser(files, path, "project")
-          }
-        })
+        output$file_list <- renderUI(create_file_browser(files, path, "project"))
       } else {
         updateTextInput(session, "project_path", value = path)
       }
@@ -2041,16 +2025,8 @@ crispr_analysis_server <- function(id) {
     observeEvent(input$browse_config, {
       config_current_dir("/project-vol")
       files <- list_files(config_current_dir())
-      print("[DEBUG] Files in /project-vol (config):")
-      print(files)
       output$config_current_path <- renderText(config_current_dir())
-      output$config_file_list <- renderUI({
-        if (is.null(files) || nrow(files) == 0) {
-          div("No files found or folder not accessible.")
-        } else {
-          create_file_browser(files, config_current_dir(), "config")
-        }
-      })
+      output$config_file_list <- renderUI(create_file_browser(files, config_current_dir(), "config"))
     })
     
     observeEvent(input$config_file_click, {
@@ -2058,16 +2034,8 @@ crispr_analysis_server <- function(id) {
       if (dir.exists(path)) {
         config_current_dir(path)
         files <- list_files(path)
-        print(paste0("[DEBUG] Files in ", path, " (config):"))
-        print(files)
         output$config_current_path <- renderText(path)
-        output$config_file_list <- renderUI({
-          if (is.null(files) || nrow(files) == 0) {
-            div("No files found or folder not accessible.")
-          } else {
-            create_file_browser(files, path, "config")
-          }
-        })
+        output$config_file_list <- renderUI(create_file_browser(files, path, "config"))
       } else {
         updateTextInput(session, "config_path", value = path)
       }
