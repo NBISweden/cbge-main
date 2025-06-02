@@ -5,7 +5,6 @@ This guide will help you set up and run the CBGE App on your local computer.
 ## Prerequisites
 
 - Windows or macOS operating system
-- Basic understanding of using Terminal (macOS) or Command Prompt (Windows)
 - Internet connection
 
 ## 1. Install Required Software
