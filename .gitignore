@@ -16,5 +16,4 @@ renv/
 /old_scripts/
 
 setup_environment.R
-cbge-main.Rproj
 .vscode/
